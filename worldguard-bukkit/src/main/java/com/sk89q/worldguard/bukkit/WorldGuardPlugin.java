@@ -74,6 +74,7 @@ import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver;
 import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.scheduler.FoliaScheduler;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.DrilldownPie;
@@ -164,7 +165,10 @@ public class WorldGuardPlugin extends JavaPlugin {
             reg.register(GeneralCommands.class);
         }
 
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
+        getServer().getGlobalRegionScheduler().runAtFixedRate(this, task -> {
+            FoliaScheduler.scheduledTasks.add(task);
+            sessionManager.run();
+        }, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
 
         // Register events
         getServer().getPluginManager().registerEvents(sessionManager, this);
@@ -205,12 +209,14 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
-        Bukkit.getScheduler().runTask(this, () -> {
+        //Bukkit.getScheduler().runTask(this, () -> {
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                ProcessPlayerEvent event = new ProcessPlayerEvent(player);
-                Events.fire(event);
+                player.getScheduler().execute(this, () -> {
+                    ProcessPlayerEvent event = new ProcessPlayerEvent(player);
+                    Events.fire(event);
+                }, null, 0L);
             }
-        });
+        //});
 
         ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
         ((SimpleDomainRegistry) WorldGuard.getInstance().getDomainRegistry()).setInitialized(true);
@@ -266,7 +272,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         WorldGuard.getInstance().disable();
-        this.getServer().getScheduler().cancelTasks(this);
+        this.getServer().getAsyncScheduler().cancelTasks(this);
+        this.getServer().getGlobalRegionScheduler().cancelTasks(this);
     }
 
     @Override

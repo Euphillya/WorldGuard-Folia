@@ -118,16 +118,16 @@ public class PlayerMoveListener extends AbstractListener {
                     current.eject();
                     vehicle.setVelocity(new Vector());
                     if (vehicle instanceof LivingEntity) {
-                        vehicle.teleport(override.clone());
+                        vehicle.teleportAsync(override.clone());
                     } else {
-                        vehicle.teleport(override.clone().add(0, 1, 0));
+                        vehicle.teleportAsync(override.clone().add(0, 1, 0));
                     }
                     current = current.getVehicle();
                 }
 
-                player.teleport(override.clone().add(0, 1, 0));
+                player.teleportAsync(override.clone().add(0, 1, 0));
 
-                Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleport(override.clone().add(0, 1, 0)), 1);
+                player.getScheduler().execute(getPlugin(), () -> player.teleportAsync(override.clone().add(0, 1, 0)), null, 1);
             }
         }
     }
@@ -141,7 +141,7 @@ public class PlayerMoveListener extends AbstractListener {
         com.sk89q.worldedit.util.Location loc = session.testMoveTo(localPlayer,
             BukkitAdapter.adapt(event.getPlayer().getLocation()), MoveType.OTHER_CANCELLABLE); // white lie
         if (loc != null) {
-            player.teleport(BukkitAdapter.adapt(loc));
+            player.teleportAsync(BukkitAdapter.adapt(loc));
         }
 
         session.uninitialize(localPlayer);

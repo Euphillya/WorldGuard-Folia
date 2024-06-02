@@ -49,11 +49,13 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     public void resetAllStates() {
         Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
         for (Player player : players) {
-            BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
-            Session session = getIfPresent(bukkitPlayer);
-            if (session != null) {
-                session.resetState(bukkitPlayer);
-            }
+           player.getScheduler().execute(WorldGuardPlugin.inst(), () -> {
+               BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
+               Session session = getIfPresent(bukkitPlayer);
+               if (session != null) {
+                   session.resetState(bukkitPlayer);
+               }
+           }, null, 0L);
         }
     }
 
@@ -67,8 +69,10 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     @Override
     public void run() {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-            get(localPlayer).tick(localPlayer);
+            player.getScheduler().execute(WorldGuardPlugin.inst(), () -> {
+                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                get(localPlayer).tick(localPlayer);
+            }, null, 0L);
         }
     }
 
@@ -88,8 +92,10 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
 
     public void shutdown() {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-            get(localPlayer).uninitialize(localPlayer);
+            player.getScheduler().execute(WorldGuardPlugin.inst(), () -> {
+                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                get(localPlayer).uninitialize(localPlayer);
+            }, null, 0L);
         }
     }
 }

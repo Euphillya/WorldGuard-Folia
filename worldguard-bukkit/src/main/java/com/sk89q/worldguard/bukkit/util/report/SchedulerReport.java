@@ -24,6 +24,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.util.report.DataReport;
+import com.sk89q.worldguard.scheduler.FoliaScheduler;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -52,24 +54,24 @@ public class SchedulerReport extends DataReport {
     public SchedulerReport() {
         super("Scheduler");
 
-        List<BukkitTask> tasks = Bukkit.getServer().getScheduler().getPendingTasks();
+        List<ScheduledTask> tasks = FoliaScheduler.scheduledTasks;
 
         append("Pending Task Count", tasks.size());
 
-        for (BukkitTask task : tasks) {
+        for (ScheduledTask task : tasks) {
             Class<?> taskClass = getTaskClass(task);
 
-            DataReport report = new DataReport("Task: #" + task.getTaskId());
-            report.append("Owner", task.getOwner().getName());
+            DataReport report = new DataReport("Task: #" + task.hashCode());
+            report.append("Owner", task.getOwningPlugin().getName());
             report.append("Runnable", taskClass != null ? taskClass.getName() : "<Unknown>");
-            report.append("Synchronous?", task.isSync());
+            //report.append("Synchronous?", task.isSync());
             append(report.getTitle(), report);
         }
     }
 
     @SuppressWarnings("unchecked")
     @Nullable
-    private Class<?> getTaskClass(BukkitTask task) {
+    private Class<?> getTaskClass(ScheduledTask task) {
         try {
             Class<?> clazz = task.getClass();
             Set<Class<?>> classes = (Set) TypeToken.of(clazz).getTypes().rawTypes();

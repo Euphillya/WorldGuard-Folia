@@ -3,7 +3,9 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 applyLibrariesConfiguration()
 
 dependencies {
-    "shade"("org.enginehub:squirrelid:${Versions.SQUIRRELID}")
+    "shade"("org.enginehub:squirrelid:${Versions.SQUIRRELID}") {
+        exclude("net.md-5", "bungeecord-chat")
+    }
     "shade"("org.khelekore:prtree:1.5.0")
 }
 
