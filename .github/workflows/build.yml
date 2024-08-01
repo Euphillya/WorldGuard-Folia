@@ -1,0 +1,60 @@
+name: Gradle Build
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build WorldEdit on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: 21
+        distribution: 'temurin'
+
+    - name: Grant execute permission to script
+      run: bash -c "chmod +x script.sh"
+    - name: Update upstream and apply patches
+      shell: bash
+      run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "Action Github"
+        ./script.sh updateUpstream
+        ./script.sh applyPatches
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        cache-read-only: ${{ !(github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/version/')) }}
+
+    - name: Execute Gradle build
+      run: |
+        cd WorldGuard-Patchs
+        ./gradlew build --stacktrace
+
+    - uses: actions/upload-artifact@v4
+      name: Archive Reports
+      if: always()
+      with:
+        name: reports for ${{ matrix.os }}
+        path: 'WorldGuard-Patchs/build/reports/**'
+
+    - uses: actions/upload-artifact@v4
+      name: Archive Logs
+      if: always()
+      with:
+        name: logs for ${{ matrix.os }}
+        path: 'WorldGuard-Patchs/*.log'
+
+    - name: Upload WorldGuard jar
+      uses: actions/upload-artifact@v4
+      with:
+        name: WorldGuard-Folia-Snapshot
+        path: WorldGuard-Patchs/worldguard-bukkit/build/libs/*
