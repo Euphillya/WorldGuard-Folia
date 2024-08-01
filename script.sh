@@ -17,7 +17,7 @@ reclone_repo() {
     rm -rf "$REPO_DIR"
     rm -rf "$REPO_DIR_PATCH"
     echo "Clonage du dépôt..."
-    git clone "$REPO_URL" "$REPO_DIR"
+    git clone "$REPO_URL" "$REPO_DIR" -b "$BRANCH_GIT"
     echo "Le dépôt a été recloné."
     echo "Début de la copie du code"
     cp -r "$REPO_DIR" "$REPO_DIR_PATCH"
