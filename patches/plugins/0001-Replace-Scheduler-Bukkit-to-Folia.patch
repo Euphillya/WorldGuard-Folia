@@ -1,18 +1,16 @@
-From 6ae00dc2ef6eab184ec1c918e145152160a032b8 Mon Sep 17 00:00:00 2001
+From f1f21a85b6e5b3603a61f21b47abeb3b834e302c Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Thu, 1 Aug 2024 10:26:38 +0200
+Date: Thu, 1 Aug 2024 10:53:58 +0200
 Subject: [PATCH 1/3] Replace Scheduler Bukkit to Folia
 
 ---
  .../bukkit/BukkitRegionContainer.java         |  2 +-
  .../worldguard/bukkit/WorldGuardPlugin.java   | 21 ++++++++++------
- .../listener/EventAbstractionListener.java    |  6 ++---
+ .../listener/EventAbstractionListener.java    |  4 ++--
  .../bukkit/listener/PlayerMoveListener.java   |  2 +-
  .../bukkit/session/BukkitSessionManager.java  | 24 ++++++++++++-------
- .../bukkit/util/PendingTasksFolia.java        | 10 ++++++++
- .../bukkit/util/report/SchedulerReport.java   | 13 +++++-----
- 7 files changed, 51 insertions(+), 27 deletions(-)
- create mode 100644 worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/PendingTasksFolia.java
+ .../bukkit/util/report/SchedulerReport.java   | 12 +++++-----
+ 6 files changed, 39 insertions(+), 26 deletions(-)
 
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/BukkitRegionContainer.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/BukkitRegionContainer.java
 index 79d7b344..bca2bb1b 100644
@@ -28,10 +26,10 @@ index 79d7b344..bca2bb1b 100644
  
      public void shutdown() {
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
-index 3ba99792..a6904d50 100644
+index 86aefb55..c585fa9f 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
-@@ -164,7 +164,7 @@ public void onEnable() {
+@@ -163,7 +163,7 @@ public void onEnable() {
              reg.register(GeneralCommands.class);
          }
  
@@ -40,7 +38,7 @@ index 3ba99792..a6904d50 100644
  
          // Register events
          getServer().getPluginManager().registerEvents(sessionManager, this);
-@@ -205,19 +205,21 @@ public void onEnable() {
+@@ -204,18 +204,20 @@ public void onEnable() {
          }
          worldListener.registerEvents();
  
@@ -58,7 +56,6 @@ index 3ba99792..a6904d50 100644
 +        //});
  
          ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
-         ((SimpleDomainRegistry) WorldGuard.getInstance().getDomainRegistry()).setInitialized(true);
  
          // Enable metrics
          final Metrics metrics = new Metrics(this, BSTATS_PLUGIN_ID); // bStats plugin id
@@ -67,42 +64,40 @@ index 3ba99792..a6904d50 100644
              setupCustomCharts(metrics);
          }
      }
-@@ -266,7 +268,7 @@ private void setupCustomCharts(Metrics metrics) {
+@@ -264,7 +266,7 @@ private void setupCustomCharts(Metrics metrics) {
      @Override
      public void onDisable() {
          WorldGuard.getInstance().disable();
 -        this.getServer().getScheduler().cancelTasks(this);
-+        this.cancelTasks(); //this.getServer().getScheduler().cancelTasks(this);
++        this.cancelTasks();
      }
  
      @Override
-@@ -526,4 +528,9 @@ public PlayerMoveListener getPlayerMoveListener() {
+@@ -524,4 +526,9 @@ public PlayerMoveListener getPlayerMoveListener() {
          return playerMoveListener;
      }
  
-+
 +    private void cancelTasks() {
 +        this.getServer().getAsyncScheduler().cancelTasks(this);
 +        this.getServer().getGlobalRegionScheduler().cancelTasks(this);
 +    }
++
  }
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-index e39a4c3c..a936c998 100644
+index 14c49c2a..1981d3fe 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-@@ -989,9 +989,9 @@ public void onInventoryMoveItem(InventoryMoveItemEvent event) {
+@@ -997,8 +997,8 @@ public void onInventoryMoveItem(InventoryMoveItemEvent event) {
  
              handleInventoryHolderUse(event, cause, targetHolder);
  
 -            if (event.isCancelled() && causeHolder instanceof Hopper && wcfg.breakDeniedHoppers) {
 -                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(),
--                        () -> ((Hopper) causeHolder).getBlock().breakNaturally());
 +            if (event.isCancelled() && causeHolder instanceof Hopper hopper && wcfg.breakDeniedHoppers) {
 +                Bukkit.getRegionScheduler().execute(getPlugin(), hopper.getLocation(),
-+                        () -> hopper.getBlock().breakNaturally());
+                         () -> ((Hopper) causeHolder).getBlock().breakNaturally());
              } else {
                  entry.setCancelled(event.isCancelled());
-             }
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/PlayerMoveListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/PlayerMoveListener.java
 index 7b95a574..83d73366 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/PlayerMoveListener.java
@@ -166,23 +161,15 @@ index df589cbc..6fb366a1 100644
      }
  }
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java
-index d897162c..8b5d16f9 100644
+index d897162c..2684727b 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java
-@@ -29,6 +29,7 @@
- 
- import javax.annotation.Nullable;
- import java.lang.reflect.Field;
-+import java.util.ArrayList;
- import java.util.List;
- import java.util.Optional;
- import java.util.Set;
-@@ -52,24 +53,24 @@ public Optional<Field> load(Class<?> clazz) throws Exception {
+@@ -52,24 +52,24 @@ public Optional<Field> load(Class<?> clazz) throws Exception {
      public SchedulerReport() {
          super("Scheduler");
  
 -        List<BukkitTask> tasks = Bukkit.getServer().getScheduler().getPendingTasks();
-+        List<io.papermc.paper.threadedregions.scheduler.ScheduledTask> tasks = new ArrayList<>();
++        List<io.papermc.paper.threadedregions.scheduler.ScheduledTask> tasks = new java.util.ArrayList<>();
  
          append("Pending Task Count", tasks.size());
  
@@ -192,7 +179,7 @@ index d897162c..8b5d16f9 100644
  
 -            DataReport report = new DataReport("Task: #" + task.getTaskId());
 -            report.append("Owner", task.getOwner().getName());
-+            DataReport report = new DataReport("Task: #" + task.hashCode());
++            DataReport report = new DataReport("Task: #" + task.getOwningPlugin());
 +            report.append("Owner", task.getOwningPlugin().getName());
              report.append("Runnable", taskClass != null ? taskClass.getName() : "<Unknown>");
 -            report.append("Synchronous?", task.isSync());
