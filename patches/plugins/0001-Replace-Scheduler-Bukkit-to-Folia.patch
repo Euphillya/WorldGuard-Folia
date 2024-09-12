@@ -1,6 +1,6 @@
-From f1f21a85b6e5b3603a61f21b47abeb3b834e302c Mon Sep 17 00:00:00 2001
+From 2547ceef84a1416958e319fa8b62fd4d0f85a4a9 Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Thu, 1 Aug 2024 10:53:58 +0200
+Date: Thu, 12 Sep 2024 16:20:06 +0200
 Subject: [PATCH 1/4] Replace Scheduler Bukkit to Folia
 
 ---
@@ -84,10 +84,10 @@ index 86aefb55..c585fa9f 100644
 +
  }
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-index 14c49c2a..1981d3fe 100644
+index 987e8423..2ffed922 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-@@ -997,8 +997,8 @@ public void onInventoryMoveItem(InventoryMoveItemEvent event) {
+@@ -1021,8 +1021,8 @@ public void onInventoryMoveItem(InventoryMoveItemEvent event) {
  
              handleInventoryHolderUse(event, cause, targetHolder);
  
