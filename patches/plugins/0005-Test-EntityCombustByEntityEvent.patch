@@ -1,30 +1,17 @@
-From eae988a4dc55419514af4a8b59f75b7bcb66092f Mon Sep 17 00:00:00 2001
+From 71388259b0ecfc27c7be9f0649311d952c186372 Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Sat, 28 Sep 2024 01:28:25 +0200
-Subject: [PATCH 5/5] Test fix #1
+Date: Tue, 22 Oct 2024 19:14:21 +0200
+Subject: [PATCH 5/5] Test EntityCombustByEntityEvent
 
 ---
- .../java/com/sk89q/worldguard/bukkit/cause/Cause.java     | 1 +
  .../bukkit/listener/EventAbstractionListener.java         | 8 ++++++--
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/cause/Cause.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/cause/Cause.java
-index f3847b33..c42c9d22 100644
---- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/cause/Cause.java
-+++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/cause/Cause.java
-@@ -51,6 +51,7 @@
- import java.util.List;
- import java.util.Set;
- import java.util.UUID;
-+import java.util.concurrent.CompletableFuture;
- 
- import static com.google.common.base.Preconditions.checkNotNull;
- 
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-index ea208cf0..928d6a93 100644
+index 48f61fd7..9be615d6 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-@@ -927,7 +927,10 @@ public void onEntityCombust(EntityCombustEvent event) {
+@@ -925,7 +925,10 @@ public void onEntityCombust(EntityCombustEvent event) {
                  // show as lit on the client consistently
                  return;
              }
@@ -36,7 +23,7 @@ index ea208cf0..928d6a93 100644
          }
      }
  
-@@ -969,7 +972,8 @@ public void onPlayerDropItem(PlayerDropItemEvent event) {
+@@ -967,7 +970,8 @@ public void onPlayerDropItem(PlayerDropItemEvent event) {
      @EventHandler(ignoreCancelled = true)
      public void onVehicleDamage(VehicleDamageEvent event) {
          Entity attacker = event.getAttacker();

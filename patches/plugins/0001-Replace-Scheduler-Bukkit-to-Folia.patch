@@ -1,19 +1,19 @@
-From dc7889c9162c0a7da0ae65d73755f64a32c0b8f2 Mon Sep 17 00:00:00 2001
+From 28f4975b9648b585f0d1544630006c44de25cb57 Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Sat, 14 Sep 2024 16:18:33 +0200
+Date: Tue, 22 Oct 2024 19:14:20 +0200
 Subject: [PATCH 1/5] Replace Scheduler Bukkit to Folia
 
 ---
  .../bukkit/BukkitRegionContainer.java         |  2 +-
- .../worldguard/bukkit/WorldGuardPlugin.java   | 21 ++++++++++------
- .../listener/EventAbstractionListener.java    |  4 ++--
+ .../worldguard/bukkit/WorldGuardPlugin.java   | 27 ++++++++++++++-----
+ .../listener/EventAbstractionListener.java    |  4 +--
  .../bukkit/listener/PlayerMoveListener.java   |  2 +-
- .../bukkit/session/BukkitSessionManager.java  | 24 ++++++++++++-------
- .../bukkit/util/report/SchedulerReport.java   | 12 +++++-----
- 6 files changed, 39 insertions(+), 26 deletions(-)
+ .../bukkit/session/BukkitSessionManager.java  | 24 ++++++++++-------
+ .../bukkit/util/report/SchedulerReport.java   | 12 ++++-----
+ 6 files changed, 45 insertions(+), 26 deletions(-)
 
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/BukkitRegionContainer.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/BukkitRegionContainer.java
-index 79d7b344..bca2bb1b 100644
+index 79d7b344..3ecd1724 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/BukkitRegionContainer.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/BukkitRegionContainer.java
 @@ -94,7 +94,7 @@ public void onChunkUnload(ChunkUnloadEvent event) {
@@ -21,24 +21,32 @@ index 79d7b344..bca2bb1b 100644
          }, plugin);
  
 -        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, cache::invalidateAll, CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
-+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, scheduledTask -> cache.invalidateAll(), CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
++        WorldGuardPlugin.scheduledTaskList.add(Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, scheduledTask -> cache.invalidateAll(), CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL));
      }
  
      public void shutdown() {
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
-index 86aefb55..c585fa9f 100644
+index 86aefb55..8d6a7fe9 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
-@@ -163,7 +163,7 @@ public void onEnable() {
+@@ -107,6 +107,7 @@ public class WorldGuardPlugin extends JavaPlugin {
+     private static BukkitWorldGuardPlatform platform;
+     private final CommandsManager<Actor> commands;
+     private PlayerMoveListener playerMoveListener;
++    public static java.util.concurrent.CopyOnWriteArrayList<io.papermc.paper.threadedregions.scheduler.ScheduledTask> scheduledTaskList = new java.util.concurrent.CopyOnWriteArrayList<>();
+ 
+     private static final int BSTATS_PLUGIN_ID = 3283;
+ 
+@@ -163,7 +164,7 @@ public void onEnable() {
              reg.register(GeneralCommands.class);
          }
  
 -        getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
-+        getServer().getGlobalRegionScheduler().runAtFixedRate(this, scheduledTask -> sessionManager.run(), BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
++        scheduledTaskList.add(getServer().getGlobalRegionScheduler().runAtFixedRate(this, scheduledTask -> sessionManager.run(), BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY));
  
          // Register events
          getServer().getPluginManager().registerEvents(sessionManager, this);
-@@ -204,18 +204,20 @@ public void onEnable() {
+@@ -204,18 +205,20 @@ public void onEnable() {
          }
          worldListener.registerEvents();
  
@@ -64,7 +72,7 @@ index 86aefb55..c585fa9f 100644
              setupCustomCharts(metrics);
          }
      }
-@@ -264,7 +266,7 @@ private void setupCustomCharts(Metrics metrics) {
+@@ -264,7 +267,7 @@ private void setupCustomCharts(Metrics metrics) {
      @Override
      public void onDisable() {
          WorldGuard.getInstance().disable();
@@ -73,21 +81,26 @@ index 86aefb55..c585fa9f 100644
      }
  
      @Override
-@@ -524,4 +526,9 @@ public PlayerMoveListener getPlayerMoveListener() {
+@@ -524,4 +527,14 @@ public PlayerMoveListener getPlayerMoveListener() {
          return playerMoveListener;
      }
  
 +    private void cancelTasks() {
++        for (io.papermc.paper.threadedregions.scheduler.ScheduledTask scheduledTask : scheduledTaskList) {
++            if (!scheduledTask.isCancelled()) {
++                scheduledTask.cancel();
++            }
++        }
 +        this.getServer().getAsyncScheduler().cancelTasks(this);
 +        this.getServer().getGlobalRegionScheduler().cancelTasks(this);
 +    }
 +
  }
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-index f2e771db..ea208cf0 100644
+index 334127cc..48f61fd7 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-@@ -1024,8 +1024,8 @@ public void onInventoryMoveItem(InventoryMoveItemEvent event) {
+@@ -1022,8 +1022,8 @@ public void onInventoryMoveItem(InventoryMoveItemEvent event) {
  
              handleInventoryHolderUse(event, cause, targetHolder);
  
@@ -161,7 +174,7 @@ index df589cbc..6fb366a1 100644
      }
  }
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java
-index d897162c..2684727b 100644
+index d897162c..ccf7e463 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/report/SchedulerReport.java
 @@ -52,24 +52,24 @@ public Optional<Field> load(Class<?> clazz) throws Exception {
@@ -169,7 +182,7 @@ index d897162c..2684727b 100644
          super("Scheduler");
  
 -        List<BukkitTask> tasks = Bukkit.getServer().getScheduler().getPendingTasks();
-+        List<io.papermc.paper.threadedregions.scheduler.ScheduledTask> tasks = new java.util.ArrayList<>();
++        List<io.papermc.paper.threadedregions.scheduler.ScheduledTask> tasks = com.sk89q.worldguard.bukkit.WorldGuardPlugin.scheduledTaskList;
  
          append("Pending Task Count", tasks.size());
  

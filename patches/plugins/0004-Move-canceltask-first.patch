@@ -1,6 +1,6 @@
-From f52b609da9318ebc9a51dbdda3764fe65db6cef1 Mon Sep 17 00:00:00 2001
+From b17275b9b923cba3860e119b911ccd3b5e5eb8bd Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Sat, 14 Sep 2024 16:18:46 +0200
+Date: Tue, 22 Oct 2024 19:14:20 +0200
 Subject: [PATCH 4/5] Move canceltask first
 
 ---
@@ -8,10 +8,10 @@ Subject: [PATCH 4/5] Move canceltask first
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
-index c585fa9f..df1554fe 100644
+index 8d6a7fe9..f2a70a3b 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
-@@ -265,8 +265,8 @@ private void setupCustomCharts(Metrics metrics) {
+@@ -266,8 +266,8 @@ private void setupCustomCharts(Metrics metrics) {
  
      @Override
      public void onDisable() {
