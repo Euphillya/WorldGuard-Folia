@@ -1,6 +1,6 @@
-From 426df69fc465d5879a62b6e8fd8c394f10b3b254 Mon Sep 17 00:00:00 2001
+From 2007e68acee470efa29216cc084b5c92565fc6ec Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Sat, 2 Nov 2024 21:11:50 +0100
+Date: Thu, 28 Nov 2024 09:00:25 +0100
 Subject: [PATCH 5/5] Test EntityCombustByEntityEvent
 
 ---
@@ -8,7 +8,7 @@ Subject: [PATCH 5/5] Test EntityCombustByEntityEvent
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-index 48f61fd7..9be615d6 100644
+index 1ac26437..0bc8a334 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
 @@ -925,7 +925,10 @@ public void onEntityCombust(EntityCombustEvent event) {
