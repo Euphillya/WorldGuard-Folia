@@ -1,0 +1,27 @@
+From 24ba6f44cd8a690f40e6f18fb52a98d7950a007f Mon Sep 17 00:00:00 2001
+From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
+Date: Thu, 5 Dec 2024 06:37:17 +0100
+Subject: [PATCH 6/6] Temp fix 1.21.3
+
+---
+ .../main/java/com/sk89q/worldguard/bukkit/util/Materials.java | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/Materials.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/Materials.java
+index 04d48dc9..3d01b1c2 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/Materials.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/util/Materials.java
+@@ -920,7 +920,9 @@ private static void putMaterialTag(Tag<Material> tag, Integer value) {
+         putMaterialTag(Tag.CAULDRONS, MODIFIED_ON_RIGHT);
+ 
+         // 1.20
+-        putMaterialTag(Tag.ITEMS_TRIM_TEMPLATES, 0);
++        try { //1.21
++            putMaterialTag(Tag.ITEMS_TRIM_TEMPLATES, 0);
++        } catch (Exception notFound) {}
+         putMaterialTag(Tag.ITEMS_DECORATED_POT_SHERDS, 0);
+ 
+         Stream.concat(Stream.concat(
+-- 
+2.45.1.windows.1
+
