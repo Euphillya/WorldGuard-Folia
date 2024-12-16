@@ -1,7 +1,7 @@
-From d2cf8004225705f43aabd1236f24f389a7280383 Mon Sep 17 00:00:00 2001
+From d1c7f632abf46253b23b32105014ed3ab3ddb35d Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Thu, 5 Dec 2024 06:47:10 +0100
-Subject: [PATCH 6/6] Temp fix 1.21.3
+Date: Mon, 16 Dec 2024 14:09:52 +0100
+Subject: [PATCH 6/8] Temp fix 1.21.3
 
 ---
  .../main/java/com/sk89q/worldguard/bukkit/util/Materials.java   | 2 +-
@@ -21,5 +21,5 @@ index 04d48dc9..8b11ded2 100644
  
          Stream.concat(Stream.concat(
 -- 
-2.45.1.windows.1
+2.47.1.windows.1
 

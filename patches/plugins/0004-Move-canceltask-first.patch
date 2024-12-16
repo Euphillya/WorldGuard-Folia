@@ -1,7 +1,7 @@
-From bf914e097e7fdb9cb74a0865e06faa6e3970cbd8 Mon Sep 17 00:00:00 2001
+From 57d7b6ae6cf253a0da9b26f727ff417a708f342c Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Thu, 5 Dec 2024 06:47:10 +0100
-Subject: [PATCH 4/6] Move canceltask first
+Date: Mon, 16 Dec 2024 14:09:52 +0100
+Subject: [PATCH 4/8] Move canceltask first
 
 ---
  .../main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java | 2 +-
@@ -22,5 +22,5 @@ index 8d6a7fe9..f2a70a3b 100644
  
      @Override
 -- 
-2.45.1.windows.1
+2.47.1.windows.1
 

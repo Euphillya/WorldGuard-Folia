@@ -1,7 +1,7 @@
-From c5d87117a01c10761bcc6b4bb4cbf0f67201bc03 Mon Sep 17 00:00:00 2001
+From b4ddd7b4d3d14d702c32d807ba73fc3ad7026ef3 Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Thu, 5 Dec 2024 06:47:09 +0100
-Subject: [PATCH 3/6] Add Folia Supported
+Date: Mon, 16 Dec 2024 14:09:51 +0100
+Subject: [PATCH 3/8] Add Folia Supported
 
 ---
  worldguard-bukkit/src/main/resources/plugin.yml | 1 +
@@ -17,5 +17,5 @@ index bccbfe3b..95bb45bc 100644
  api-version: "1.21"
 +folia-supported: true
 -- 
-2.45.1.windows.1
+2.47.1.windows.1
 
