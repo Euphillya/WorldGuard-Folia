@@ -1,7 +1,7 @@
 From 820cd1a7edb224cbb35aa14666dd5e9134083489 Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
 Date: Fri, 27 Dec 2024 01:22:01 +0100
-Subject: [PATCH 2/6] EntityTeleport to EntityTeleportAsync
+Subject: [PATCH 2/7] EntityTeleport to EntityTeleportAsync
 
 ---
  .../java/com/sk89q/worldguard/bukkit/BukkitPlayer.java |  2 +-
