@@ -1,7 +1,7 @@
-From 7a55a818ec59d0ae4e95f887eb82a11f46c7c8e9 Mon Sep 17 00:00:00 2001
+From a4f1ed64257438cce82c65fe358628421f200eb8 Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Fri, 27 Dec 2024 01:22:01 +0100
-Subject: [PATCH 1/7] Replace Scheduler Bukkit to Folia
+Date: Sat, 18 Jan 2025 20:54:17 +0100
+Subject: [PATCH 1/6] Replace Scheduler Bukkit to Folia
 
 ---
  .../bukkit/BukkitRegionContainer.java         |  2 +-
@@ -97,7 +97,7 @@ index 86aefb55..8d6a7fe9 100644
 +
  }
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-index 120ac1a3..1ac26437 100644
+index c1e9876d..f1b72223 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
 @@ -1022,8 +1022,8 @@ public void onInventoryMoveItem(InventoryMoveItemEvent event) {
@@ -196,5 +196,5 @@ index d897162c..ccf7e463 100644
              Class<?> clazz = task.getClass();
              Set<Class<?>> classes = (Set) TypeToken.of(clazz).getTypes().rawTypes();
 -- 
-2.47.1.windows.1
+2.47.1.windows.2
 

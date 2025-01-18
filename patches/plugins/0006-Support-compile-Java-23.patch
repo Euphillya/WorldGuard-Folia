@@ -1,7 +1,7 @@
-From 96d0b1f3b10bf12ed45cecbd7c013d85cc60a4e7 Mon Sep 17 00:00:00 2001
+From ccb80e66166e0689b73cccefe3b1b37147a85fe5 Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Fri, 27 Dec 2024 01:22:02 +0100
-Subject: [PATCH 6/7] Support compile Java 23
+Date: Sat, 18 Jan 2025 20:54:31 +0100
+Subject: [PATCH 6/6] Support compile Java 23
 
 ---
  gradle/wrapper/gradle-wrapper.properties | 2 +-
@@ -20,5 +20,5 @@ index a4413138..c1d5e018 100644
  validateDistributionUrl=true
  zipStoreBase=GRADLE_USER_HOME
 -- 
-2.47.1.windows.1
+2.47.1.windows.2
 

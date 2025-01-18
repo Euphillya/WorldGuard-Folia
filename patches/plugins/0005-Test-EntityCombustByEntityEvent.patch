@@ -1,14 +1,14 @@
-From bddda75a63826f4c1ee2dc72547a89e3e0665f96 Mon Sep 17 00:00:00 2001
+From c19b4a6d5b127bca0043e5c261adb458b3101037 Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Fri, 27 Dec 2024 01:22:02 +0100
-Subject: [PATCH 5/7] Test EntityCombustByEntityEvent
+Date: Sat, 18 Jan 2025 20:54:30 +0100
+Subject: [PATCH 5/6] Test EntityCombustByEntityEvent
 
 ---
  .../bukkit/listener/EventAbstractionListener.java         | 8 ++++++--
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-index 1ac26437..0bc8a334 100644
+index f1b72223..7e84d717 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
 @@ -925,7 +925,10 @@ public void onEntityCombust(EntityCombustEvent event) {
@@ -34,5 +34,5 @@ index 1ac26437..0bc8a334 100644
  
      //-------------------------------------------------------------------------
 -- 
-2.47.1.windows.1
+2.47.1.windows.2
 
