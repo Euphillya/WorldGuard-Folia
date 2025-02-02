@@ -1,7 +1,7 @@
-From c19b4a6d5b127bca0043e5c261adb458b3101037 Mon Sep 17 00:00:00 2001
+From 75ac3f67df6ec1cacf81e65786f46e30099170b2 Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Sat, 18 Jan 2025 20:54:30 +0100
-Subject: [PATCH 5/6] Test EntityCombustByEntityEvent
+Date: Sun, 2 Feb 2025 13:25:18 +0100
+Subject: [PATCH 5/5] Test EntityCombustByEntityEvent
 
 ---
  .../bukkit/listener/EventAbstractionListener.java         | 8 ++++++--
