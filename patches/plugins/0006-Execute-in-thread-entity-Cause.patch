@@ -1,0 +1,97 @@
+From ac3abfb28d711b5b1f32556f2723bed4bc5d0828 Mon Sep 17 00:00:00 2001
+From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
+Date: Mon, 17 Feb 2025 18:50:36 +0100
+Subject: [PATCH 6/6] Execute in thread entity Cause
+
+---
+ .../sk89q/worldguard/bukkit/cause/Cause.java  | 55 ++++++++++++-------
+ 1 file changed, 35 insertions(+), 20 deletions(-)
+
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/cause/Cause.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/cause/Cause.java
+index 84f0c3f6..50a4b34e 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/cause/Cause.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/cause/Cause.java
+@@ -301,25 +301,27 @@ private void addAll(@Nullable Object... element) {
+                         if (spawningUUID != null) {
+                             Entity spawningEntity = Bukkit.getEntity(spawningUUID);
+                             if (spawningEntity != null) {
+-                                addAll(spawningEntity);
++                                spawningEntity.getScheduler().run(WorldGuardPlugin.inst(), task -> addAll(spawningEntity), null);
+                             }
+                         }
+                     }
+-                } else if (o instanceof Vehicle) {
+-                    ((Vehicle) o).getPassengers().forEach(this::addAll);
+-                } else if (o instanceof AreaEffectCloud) {
++                } else if (o instanceof Vehicle v) {
++                    v.getScheduler().run(WorldGuardPlugin.inst(), task -> ((Vehicle) o).getPassengers().forEach(this::addAll), null);
++                } else if (o instanceof AreaEffectCloud a) {
+                     indirect = true;
+-                    addAll(((AreaEffectCloud) o).getSource());
++                    a.getScheduler().run(WorldGuardPlugin.inst(), task -> addAll(((AreaEffectCloud) o).getSource()), null);
+                 } else if (o instanceof Tameable tameable) {
+                     indirect = true;
+                     if (PaperLib.isPaper()) {
+-                        UUID ownerId = tameable.getOwnerUniqueId();
+-                        if (ownerId != null) {
+-                            Player owner = Bukkit.getPlayer(ownerId);
+-                            if (owner != null) {
+-                                addAll(owner);
++                        tameable.getScheduler().run(WorldGuardPlugin.inst(), task -> {
++                            UUID ownerId = tameable.getOwnerUniqueId();
++                            if (ownerId != null) {
++                                Player owner = Bukkit.getPlayer(ownerId);
++                                if (owner != null) {
++                                    owner.getScheduler().run(WorldGuardPlugin.inst(), task1 -> addAll(owner), null);
++                                }
+                             }
+-                        }
++                        }, null);
+                     } else {
+                         // this will cause offline player loads if the player is offline
+                         // too bad for spigot users
+@@ -330,19 +332,32 @@ private void addAll(@Nullable Object... element) {
+                     }
+                 } else if (o instanceof Creeper c) {
+                     indirect = true;
+-                    addAll(c.getTarget(), c.getIgniter());
++                    c.getScheduler().run(WorldGuardPlugin.inst(), task -> addAll(c.getTarget(), c.getIgniter()), null);
+                 } else if (o instanceof Creature c) {
+                     indirect = true;
+-                    addAll(c.getTarget());
++                    c.getScheduler().run(WorldGuardPlugin.inst(), task -> addAll(c.getTarget()), null);
+                 } else if (o instanceof BlockProjectileSource) {
+                     addAll(((BlockProjectileSource) o).getBlock());
+-                } else if (o instanceof LightningStrike && PaperLib.isPaper() &&
+-                        ((LightningStrike) o).getCausingEntity() != null) {
+-                    indirect = true;
+-                    addAll(((LightningStrike) o).getCausingEntity());
+-                } else if (o instanceof FallingBlock f && PaperLib.isPaper() && f.getOrigin() != null) {
+-                    indirect = true;
+-                    addAll(f.getOrigin().getBlock());
++                } else if (o instanceof LightningStrike ls && PaperLib.isPaper()) {
++                    ls.getScheduler().run(WorldGuardPlugin.inst(), task -> {
++                        if (((LightningStrike) o).getCausingEntity() != null) {
++                            indirect = true;
++                            addAll(((LightningStrike) o).getCausingEntity());
++                        } else if (o instanceof FallingBlock f && PaperLib.isPaper())
++                            f.getScheduler().run(WorldGuardPlugin.inst(), task1 -> {
++                                if (f.getOrigin() != null) {
++                                    indirect = true;
++                                    addAll(f.getOrigin().getBlock());
++                                }
++                            }, null);
++                    }, null);
++                } else if (o instanceof FallingBlock f && PaperLib.isPaper()) {
++                    f.getScheduler().run(WorldGuardPlugin.inst(), task -> {
++                        if (f.getOrigin() != null) {
++                            indirect = true;
++                            addAll(f.getOrigin().getBlock());
++                        }
++                    }, null);
+                 }
+ 
+                 // Add manually tracked parent causes
+-- 
+2.48.1.windows.1
+

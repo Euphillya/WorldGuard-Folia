@@ -1,17 +1,17 @@
-From 75ac3f67df6ec1cacf81e65786f46e30099170b2 Mon Sep 17 00:00:00 2001
+From 1d0069ad2210516267d0ac44b1f3f43bceaa9b11 Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Sun, 2 Feb 2025 13:25:18 +0100
-Subject: [PATCH 5/5] Test EntityCombustByEntityEvent
+Date: Mon, 17 Feb 2025 18:38:28 +0100
+Subject: [PATCH 5/6] Test EntityCombustByEntityEvent
 
 ---
  .../bukkit/listener/EventAbstractionListener.java         | 8 ++++++--
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-index f1b72223..7e84d717 100644
+index b23ecd0c..dafb6305 100644
 --- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
 +++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/EventAbstractionListener.java
-@@ -925,7 +925,10 @@ public void onEntityCombust(EntityCombustEvent event) {
+@@ -936,7 +936,10 @@ public void onEntityCombust(EntityCombustEvent event) {
                  // show as lit on the client consistently
                  return;
              }
@@ -23,7 +23,7 @@ index f1b72223..7e84d717 100644
          }
      }
  
-@@ -967,7 +970,8 @@ public void onPlayerDropItem(PlayerDropItemEvent event) {
+@@ -978,7 +981,8 @@ public void onPlayerDropItem(PlayerDropItemEvent event) {
      @EventHandler(ignoreCancelled = true)
      public void onVehicleDamage(VehicleDamageEvent event) {
          Entity attacker = event.getAttacker();
@@ -34,5 +34,5 @@ index f1b72223..7e84d717 100644
  
      //-------------------------------------------------------------------------
 -- 
-2.47.1.windows.2
+2.48.1.windows.1
 
