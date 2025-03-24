@@ -1,6 +1,6 @@
-From 5a4fd677ec156f62750ab1e9042cddc1faabe66d Mon Sep 17 00:00:00 2001
+From f6d49919af388519bac00ce0fe0b8146e8d4fa2e Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Mon, 17 Feb 2025 18:38:27 +0100
+Date: Mon, 24 Mar 2025 15:57:16 +0100
 Subject: [PATCH 3/6] Add Folia Supported
 
 ---
@@ -17,5 +17,5 @@ index bccbfe3b..95bb45bc 100644
  api-version: "1.21"
 +folia-supported: true
 -- 
-2.48.1.windows.1
+2.49.0.windows.1
 
