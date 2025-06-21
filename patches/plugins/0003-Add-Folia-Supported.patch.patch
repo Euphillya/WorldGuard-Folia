@@ -1,21 +1,22 @@
-From f6d49919af388519bac00ce0fe0b8146e8d4fa2e Mon Sep 17 00:00:00 2001
+From 00057c550b9de5d5781169df6ff307a98b3761a3 Mon Sep 17 00:00:00 2001
 From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Mon, 24 Mar 2025 15:57:16 +0100
-Subject: [PATCH 3/6] Add Folia Supported
+Date: Sat, 21 Jun 2025 22:11:29 +0200
+Subject: [PATCH 3/6] Add Folia Supported.patch
 
 ---
  worldguard-bukkit/src/main/resources/plugin.yml | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/worldguard-bukkit/src/main/resources/plugin.yml b/worldguard-bukkit/src/main/resources/plugin.yml
-index bccbfe3b..95bb45bc 100644
+index 8435e6dc..0b4a5586 100644
 --- a/worldguard-bukkit/src/main/resources/plugin.yml
 +++ b/worldguard-bukkit/src/main/resources/plugin.yml
-@@ -4,3 +4,4 @@ version: "${internalVersion}"
+@@ -3,3 +3,4 @@ main: com.sk89q.worldguard.bukkit.WorldGuardPlugin
+ version: "${internalVersion}"
  depend: [WorldEdit]
- softdepend: [CommandBook]
- api-version: "1.21"
+ api-version: "1.21.5"
 +folia-supported: true
+\ No newline at end of file
 -- 
-2.49.0.windows.1
+2.50.0.windows.1
 
