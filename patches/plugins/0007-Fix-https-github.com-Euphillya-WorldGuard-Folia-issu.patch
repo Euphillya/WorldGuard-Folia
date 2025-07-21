@@ -1,0 +1,52 @@
+From 408af50e16cf182a98d1014dc469802276cb30d4 Mon Sep 17 00:00:00 2001
+From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
+Date: Mon, 21 Jul 2025 15:02:21 +0200
+Subject: [PATCH 7/7] Fix
+ https://github.com/Euphillya/WorldGuard-Folia/issues/2
+
+---
+ .../listener/WorldGuardPlayerListener.java    | 23 +++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/WorldGuardPlayerListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/WorldGuardPlayerListener.java
+index 1656ab32..b44b5e49 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/WorldGuardPlayerListener.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/WorldGuardPlayerListener.java
+@@ -43,6 +43,7 @@
+ import org.bukkit.Material;
+ import org.bukkit.World;
+ import org.bukkit.block.Block;
++import org.bukkit.entity.EnderPearl;
+ import org.bukkit.entity.Entity;
+ import org.bukkit.entity.Player;
+ import org.bukkit.event.Event;
+@@ -444,4 +445,26 @@ public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+             }
+         }
+     }
++
++    // Fix ENDERPEARL folia
++    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
++    public void onPlayerLaunchProjectileEvent(final com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent event) {
++        if (event.getProjectile() instanceof EnderPearl pearl) {
++            if (pearl.getShooter() instanceof Player player) {
++                LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
++                if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
++                    RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
++                    ApplicableRegionSet set = query.getApplicableRegions(BukkitAdapter.adapt(pearl.getLocation()));
++                    if (!set.testState(localPlayer, Flags.ENDERPEARL)) {
++                        event.setCancelled(true);
++                        String message = set.queryValue(localPlayer, Flags.DENY_MESSAGE);
++                        if (message != null && !message.isEmpty()) {
++                            player.sendMessage(message);
++                        }
++                    }
++                }
++            }
++        }
++    }
++
+ }
+-- 
+2.50.1.windows.1
+
