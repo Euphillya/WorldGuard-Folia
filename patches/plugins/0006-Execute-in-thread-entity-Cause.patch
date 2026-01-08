@@ -1,6 +1,6 @@
-From 3057affcddde08d21ff6a06cdbb88348245d298e Mon Sep 17 00:00:00 2001
-From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Fri, 31 Oct 2025 00:26:14 +0100
+From 32396c446b90e70b9e5b18fb170543c1be260557 Mon Sep 17 00:00:00 2001
+From: Bierque Euphyllia <bierque.euphyllia@gmail.com>
+Date: Thu, 8 Jan 2026 17:58:52 +0100
 Subject: [PATCH 6/8] Execute in thread entity Cause
 
 ---
@@ -93,5 +93,5 @@ index 84f0c3f6..50a4b34e 100644
  
                  // Add manually tracked parent causes
 -- 
-2.50.1.windows.1
+2.52.0.windows.1
 

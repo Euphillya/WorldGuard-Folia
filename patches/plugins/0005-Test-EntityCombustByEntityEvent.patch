@@ -1,6 +1,6 @@
-From c2d873504d69c51d1ea3f8258cf6098d2b96f4d8 Mon Sep 17 00:00:00 2001
-From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Fri, 31 Oct 2025 00:26:14 +0100
+From 163da1bdd07a1a7b078cf93ff8d341b1d8831ef0 Mon Sep 17 00:00:00 2001
+From: Bierque Euphyllia <bierque.euphyllia@gmail.com>
+Date: Thu, 8 Jan 2026 17:58:52 +0100
 Subject: [PATCH 5/8] Test EntityCombustByEntityEvent
 
 ---
@@ -34,5 +34,5 @@ index cb76b101..8db2f8cd 100644
  
      //-------------------------------------------------------------------------
 -- 
-2.50.1.windows.1
+2.52.0.windows.1
 

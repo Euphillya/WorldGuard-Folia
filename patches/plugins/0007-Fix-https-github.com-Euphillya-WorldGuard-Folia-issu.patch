@@ -1,6 +1,6 @@
-From 8b576bd4143034732282d32963e54c44fb413601 Mon Sep 17 00:00:00 2001
-From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Fri, 31 Oct 2025 00:26:14 +0100
+From 20925e90618b79b737bc68887ce33f755d29f224 Mon Sep 17 00:00:00 2001
+From: Bierque Euphyllia <bierque.euphyllia@gmail.com>
+Date: Thu, 8 Jan 2026 17:58:53 +0100
 Subject: [PATCH 7/8] Fix https github.com Euphillya WorldGuard Folia issu
 
 ---
@@ -47,5 +47,5 @@ index 1656ab32..b44b5e49 100644
 +
  }
 -- 
-2.50.1.windows.1
+2.52.0.windows.1
 

@@ -1,6 +1,6 @@
-From bab07efbe8090f2ed30779de0c7034ef97a22137 Mon Sep 17 00:00:00 2001
-From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Fri, 31 Oct 2025 00:26:13 +0100
+From 42bc4f61fd9e68f786d38352802a8b7e37a0400d Mon Sep 17 00:00:00 2001
+From: Bierque Euphyllia <bierque.euphyllia@gmail.com>
+Date: Thu, 8 Jan 2026 17:58:52 +0100
 Subject: [PATCH 4/8] Move canceltask first
 
 ---
@@ -22,5 +22,5 @@ index 8d6a7fe9..f2a70a3b 100644
  
      @Override
 -- 
-2.50.1.windows.1
+2.52.0.windows.1
 

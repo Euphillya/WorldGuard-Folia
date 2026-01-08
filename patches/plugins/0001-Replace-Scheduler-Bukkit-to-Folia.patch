@@ -1,6 +1,6 @@
-From e42078aefcd07d9dfd44ea4525d4e6ac37db3d02 Mon Sep 17 00:00:00 2001
-From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Fri, 31 Oct 2025 00:26:13 +0100
+From 52e81cd39555659b82d649b47fdb2240b77fc702 Mon Sep 17 00:00:00 2001
+From: Bierque Euphyllia <bierque.euphyllia@gmail.com>
+Date: Thu, 8 Jan 2026 17:58:51 +0100
 Subject: [PATCH 1/8] Replace Scheduler Bukkit to Folia
 
 ---
@@ -196,5 +196,5 @@ index d897162c..ccf7e463 100644
              Class<?> clazz = task.getClass();
              Set<Class<?>> classes = (Set) TypeToken.of(clazz).getTypes().rawTypes();
 -- 
-2.50.1.windows.1
+2.52.0.windows.1
 

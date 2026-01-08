@@ -1,6 +1,6 @@
-From 017eb4b9d99943e7472bbfe194244f4e267ab318 Mon Sep 17 00:00:00 2001
-From: Euphyllia Bierque <bierque.euphyllia@gmail.com>
-Date: Fri, 31 Oct 2025 00:26:15 +0100
+From 0c5c686dfce9f00dccf77d5e95414e4ec9713f81 Mon Sep 17 00:00:00 2001
+From: Bierque Euphyllia <bierque.euphyllia@gmail.com>
+Date: Thu, 8 Jan 2026 17:58:53 +0100
 Subject: [PATCH 8/8] Bump bstats
 
 ---
@@ -8,10 +8,10 @@ Subject: [PATCH 8/8] Bump bstats
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
-index b21bbed3..137a88d9 100644
+index 88d22880..b038a900 100644
 --- a/gradle/libs.versions.toml
 +++ b/gradle/libs.versions.toml
-@@ -31,7 +31,7 @@ paperApi = "io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT"
+@@ -31,7 +31,7 @@ paperApi = "io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT"
  paperLib = "io.papermc:paperlib:1.0.8"
  
  dummypermscompat = "com.sk89q:dummypermscompat:1.10"
@@ -21,5 +21,5 @@ index b21bbed3..137a88d9 100644
  prtree = "org.khelekore:prtree:1.5.0"
  
 -- 
-2.50.1.windows.1
+2.52.0.windows.1
 
