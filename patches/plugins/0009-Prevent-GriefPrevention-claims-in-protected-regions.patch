@@ -1,0 +1,227 @@
+From 19d2faf14531abf5d827e1e6a4b5668b21b6dcf3 Mon Sep 17 00:00:00 2001
+From: Aelshi-Nui <itzpritam9475@gmail.com>
+Date: Tue, 28 Jul 2026 20:54:03 +0000
+Subject: [PATCH 9/9] Prevent GriefPrevention claims in protected regions
+
+---
+ .../worldguard/bukkit/WorldGuardPlugin.java   |   2 +
+ .../listener/GriefPreventionListener.java     | 190 ++++++++++++++++++
+ 2 files changed, 192 insertions(+)
+ create mode 100644 worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/GriefPreventionListener.java
+
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
+index 9229d1db..f7b47d46 100644
+--- a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
+@@ -45,6 +45,7 @@
+ import com.sk89q.worldguard.bukkit.listener.ChestProtectionListener;
+ import com.sk89q.worldguard.bukkit.listener.DebuggingListener;
+ import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
++import com.sk89q.worldguard.bukkit.listener.GriefPreventionListener;
+ import com.sk89q.worldguard.bukkit.listener.InvincibilityListener;
+ import com.sk89q.worldguard.bukkit.listener.PlayerModesListener;
+ import com.sk89q.worldguard.bukkit.listener.PlayerMoveListener;
+@@ -200,6 +201,7 @@ public void accept(Object ignored) {
+         (new WorldRulesListener(this)).registerEvents();
+         (new BlockedPotionsListener(this)).registerEvents();
+         (new EventAbstractionListener(this)).registerEvents();
++        (new GriefPreventionListener(this)).registerEvents();
+         (new PlayerModesListener(this)).registerEvents();
+         (new BuildPermissionListener(this)).registerEvents();
+         (new InvincibilityListener(this)).registerEvents();
+diff --git a/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/GriefPreventionListener.java b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/GriefPreventionListener.java
+new file mode 100644
+index 00000000..b9667406
+--- /dev/null
++++ b/worldguard-bukkit/src/main/java/com/sk89q/worldguard/bukkit/listener/GriefPreventionListener.java
+@@ -0,0 +1,190 @@
++/*
++ * WorldGuard, a suite of tools for Minecraft
++ * Copyright (C) sk89q <http://www.sk89q.com>
++ * Copyright (C) WorldGuard team and contributors
++ *
++ * This program is free software: you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by the
++ * Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
++ * for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this program. If not, see <http://www.gnu.org/licenses/>.
++ */
++
++package com.sk89q.worldguard.bukkit.listener;
++
++import com.sk89q.worldedit.bukkit.BukkitAdapter;
++import com.sk89q.worldedit.math.BlockVector3;
++import com.sk89q.worldguard.LocalPlayer;
++import com.sk89q.worldguard.WorldGuard;
++import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
++import com.sk89q.worldguard.protection.flags.Flags;
++import com.sk89q.worldguard.protection.managers.RegionManager;
++import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
++import org.bukkit.ChatColor;
++import org.bukkit.Location;
++import org.bukkit.entity.Player;
++import org.bukkit.event.Cancellable;
++import org.bukkit.event.Event;
++import org.bukkit.event.EventHandler;
++import org.bukkit.event.EventPriority;
++import org.bukkit.event.server.PluginEnableEvent;
++import org.bukkit.plugin.EventExecutor;
++import org.bukkit.plugin.Plugin;
++import org.bukkit.plugin.PluginManager;
++
++import java.lang.reflect.InvocationTargetException;
++import java.lang.reflect.Method;
++import java.util.logging.Level;
++
++/**
++ * Prevents GriefPrevention claims from overlapping WorldGuard regions in which
++ * the player cannot build.
++ *
++ * <p>GriefPrevention is accessed reflectively so it remains a truly optional
++ * dependency and multiple compatible API versions can be supported.</p>
++ */
++public final class GriefPreventionListener extends AbstractListener {
++
++    private static final String PLUGIN_NAME = "GriefPrevention";
++    private static final String CLAIM_CLASS = "me.ryanhamshire.GriefPrevention.Claim";
++    private static final String CLAIM_CREATED_EVENT =
++            "me.ryanhamshire.GriefPrevention.events.ClaimCreatedEvent";
++    private static final String CLAIM_RESIZE_EVENT =
++            "me.ryanhamshire.GriefPrevention.events.ClaimResizeEvent";
++    private static final String TEMP_REGION_ID = "__worldguard_griefprevention_check__";
++    private static final String DENIAL_MESSAGE =
++            "You can't claim this area because it overlaps a WorldGuard region where you cannot build.";
++
++    private boolean hooked;
++    private Method lesserBoundaryAccessor;
++    private Method greaterBoundaryAccessor;
++
++    public GriefPreventionListener(WorldGuardPlugin plugin) {
++        super(plugin);
++    }
++
++    @Override
++    public void registerEvents() {
++        super.registerEvents();
++        tryHook();
++    }
++
++    @EventHandler
++    public void onPluginEnable(PluginEnableEvent event) {
++        if (PLUGIN_NAME.equals(event.getPlugin().getName())) {
++            tryHook();
++        }
++    }
++
++    private void tryHook() {
++        if (hooked) {
++            return;
++        }
++
++        Plugin griefPrevention = getPlugin().getServer().getPluginManager().getPlugin(PLUGIN_NAME);
++        if (griefPrevention == null || !griefPrevention.isEnabled()) {
++            return;
++        }
++
++        try {
++            ClassLoader classLoader = griefPrevention.getClass().getClassLoader();
++            Class<?> claimClass = Class.forName(CLAIM_CLASS, false, classLoader);
++            lesserBoundaryAccessor = claimClass.getMethod("getLesserBoundaryCorner");
++            greaterBoundaryAccessor = claimClass.getMethod("getGreaterBoundaryCorner");
++
++            registerClaimEvent(classLoader, CLAIM_CREATED_EVENT, "getClaim", "getCreator");
++            registerClaimEvent(classLoader, CLAIM_RESIZE_EVENT, "getTo", "getModifier");
++            hooked = true;
++            getPlugin().getLogger().info("Enabled GriefPrevention claim overlap protection.");
++        } catch (ReflectiveOperationException | LinkageError e) {
++            getPlugin().getLogger().log(Level.WARNING,
++                    "Unable to enable GriefPrevention claim overlap protection.", e);
++        }
++    }
++
++    private void registerClaimEvent(
++            ClassLoader classLoader,
++            String eventClassName,
++            String claimAccessorName,
++            String actorAccessorName
++    ) throws ReflectiveOperationException {
++        Class<? extends Event> eventClass =
++                Class.forName(eventClassName, false, classLoader).asSubclass(Event.class);
++        Method claimAccessor = eventClass.getMethod(claimAccessorName);
++        Method actorAccessor = eventClass.getMethod(actorAccessorName);
++        EventExecutor executor = (listener, event) ->
++                handleClaimEvent(event, claimAccessor, actorAccessor);
++        PluginManager pluginManager = getPlugin().getServer().getPluginManager();
++        pluginManager.registerEvent(
++                eventClass,
++                this,
++                EventPriority.HIGHEST,
++                executor,
++                getPlugin(),
++                true
++        );
++    }
++
++    private void handleClaimEvent(Event event, Method claimAccessor, Method actorAccessor) {
++        if (!(event instanceof Cancellable cancellable)) {
++            return;
++        }
++
++        try {
++            Object claim = claimAccessor.invoke(event);
++            Object actor = actorAccessor.invoke(event);
++            if (!(actor instanceof Player player)) {
++                return;
++            }
++
++            Location lesserCorner = (Location) lesserBoundaryAccessor.invoke(claim);
++            Location greaterCorner = (Location) greaterBoundaryAccessor.invoke(claim);
++            if (!canCreateClaim(player, lesserCorner, greaterCorner)) {
++                cancellable.setCancelled(true);
++                player.sendMessage(ChatColor.RED + DENIAL_MESSAGE);
++            }
++        } catch (IllegalAccessException | InvocationTargetException | ClassCastException e) {
++            getPlugin().getLogger().log(Level.WARNING,
++                    "Unable to validate a GriefPrevention claim against WorldGuard.", e);
++        }
++    }
++
++    private boolean canCreateClaim(Player player, Location lesserCorner, Location greaterCorner) {
++        org.bukkit.World bukkitWorld = lesserCorner.getWorld();
++        if (bukkitWorld == null || bukkitWorld != greaterCorner.getWorld()) {
++            return true;
++        }
++
++        LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
++        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(bukkitWorld);
++        if (WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, world)) {
++            return true;
++        }
++
++        RegionManager manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
++        if (manager == null) {
++            return true;
++        }
++
++        int minimumX = Math.min(lesserCorner.getBlockX(), greaterCorner.getBlockX());
++        int minimumZ = Math.min(lesserCorner.getBlockZ(), greaterCorner.getBlockZ());
++        int maximumX = Math.max(lesserCorner.getBlockX(), greaterCorner.getBlockX());
++        int maximumZ = Math.max(lesserCorner.getBlockZ(), greaterCorner.getBlockZ());
++        // GriefPrevention land claims are columns, so include the complete
++        // world height rather than only the Y values reported by the claim.
++        ProtectedCuboidRegion claimRegion = new ProtectedCuboidRegion(
++                TEMP_REGION_ID,
++                BlockVector3.at(minimumX, bukkitWorld.getMinHeight(), minimumZ),
++                BlockVector3.at(maximumX, bukkitWorld.getMaxHeight() - 1, maximumZ)
++        );
++
++        return manager.getApplicableRegions(claimRegion).testState(localPlayer, Flags.BUILD);
++    }
++}
